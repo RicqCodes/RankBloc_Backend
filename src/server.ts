@@ -1,6 +1,14 @@
 import mongoose from "mongoose";
 
 import { port } from "./config";
+import AppError from "./utils/appError";
+
+process.on("uncaughtException", (err) => {
+  console.log(err.name, err.message);
+  console.log("UNCAUGHT EXCEPTION!, SHUTTING DOWN");
+  process.exit(1);
+});
+
 import app from "./app";
 
 const DB_URI = process.env.DATABASE?.replace(
@@ -17,6 +25,14 @@ mongoose
     console.log("Mongo connection error ", err);
   });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+});
+
+process.on("unhandledRejection", (err: AppError) => {
+  console.log(err.name, err.message);
+  console.log("UNHANDLED REJECTION!, SHUTTING DOWN");
+  server.close(() => {
+    process.exit(1);
+  });
 });
