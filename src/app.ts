@@ -7,10 +7,6 @@ import globalErrorHandler from "./controllers/errorController";
 const app = express();
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Hello, world!");
-});
-
 app.use("/api/v1/users", userRoutes);
 
 // unhandled routes

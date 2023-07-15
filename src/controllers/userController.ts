@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import User from "../models/userModel";
 import AppError from "../utils/appError";
+import { ApiFeatures } from "../utils/apiFeatures";
 
 export const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -28,12 +29,24 @@ export const createUser = catchAsync(
   }
 );
 
-export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined",
-  });
-});
+export const getAllUsers = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Execute query
+    const features = new ApiFeatures(User.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const users = await features.query;
+    res.status(200).json({
+      status: "status",
+      results: users.length,
+      data: {
+        users,
+      },
+    });
+  }
+);
 
 export const getUser = catchAsync(async (req: Request, res: Response) => {
   res.status(500).json({
