@@ -13,12 +13,8 @@ const router = Router();
 
 router.param("id", checkID);
 
-router.route("/api/v1/users").get(getAllUsers).post(createUser);
+router.route("/").get(getAllUsers).post(createUser);
 
-router
-  .route("/api/v1/users/:id")
-  .get(getUser)
-  .patch(updateUser)
-  .delete(deleteUser);
+router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
 
 export default router;
