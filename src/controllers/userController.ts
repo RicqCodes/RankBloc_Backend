@@ -38,8 +38,9 @@ export const getAllUsers = catchAsync(
       .limitFields()
       .paginate();
     const users = await features.query;
+
     res.status(200).json({
-      status: "status",
+      status: "success",
       results: users.length,
       data: {
         users,
@@ -48,23 +49,45 @@ export const getAllUsers = catchAsync(
   }
 );
 
-export const getUser = catchAsync(async (req: Request, res: Response) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined",
-  });
-});
+export const getUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { address } = req.query;
+
+    const user = await User.findOne({ publicAddress: address });
+
+    if (!user) {
+      next(new AppError("User does not exist", 404));
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user,
+      },
+    });
+  }
+);
 
 export const updateUser = catchAsync(async (req: Request, res: Response) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined",
+  const { address } = req.query;
+  const user = await User.findOneAndUpdate(
+    { publicAddress: address },
+    req.body,
+    { new: true, runValidators: true }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: { user },
   });
 });
 
 export const deleteUser = catchAsync((req: Request, res: Response) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined",
+  const { address } = req.query;
+  User.findOneAndDelete({ publicAddress: address });
+
+  res.status(204).json({
+    status: "success",
+    data: null,
   });
 });
