@@ -128,7 +128,7 @@ export const updateBlogPost = catchAsync(
       }
     );
 
-    res.status(200).json(updatedBlogPost);
+    res.status(200).json({ status: "success", data: updatedBlogPost });
   }
 );
 
