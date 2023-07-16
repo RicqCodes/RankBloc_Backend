@@ -48,6 +48,11 @@ const userSchema = new Schema<IUser>(
       type: Number,
       default: 0,
     },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
     badges: [
       {
         type: Schema.Types.ObjectId,

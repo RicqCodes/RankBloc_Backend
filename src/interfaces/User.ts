@@ -8,5 +8,6 @@ export interface IUser extends Document {
   signedMessage: string;
   reputation: number;
   tokens: number;
+  role: "user" | "admin";
   badges: IBadge[];
 }

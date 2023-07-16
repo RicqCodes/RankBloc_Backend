@@ -82,9 +82,9 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const deleteUser = catchAsync((req: Request, res: Response) => {
+export const deleteUser = catchAsync(async (req: Request, res: Response) => {
   const { address } = req.query;
-  User.findOneAndDelete({ publicAddress: address });
+  await User.findOneAndDelete({ publicAddress: address });
 
   res.status(204).json({
     status: "success",

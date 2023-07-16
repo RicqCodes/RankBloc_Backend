@@ -15,31 +15,33 @@ const blogPostSchema = new Schema(
       ref: "User",
       required: true,
     },
+    views: {
+      type: Number,
+      default: 0,
+    },
     images: [
       {
         type: String,
-        required: true,
       },
     ],
-    likes: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Likes",
-        required: true,
-      },
-    ],
+    likeCount: {
+      type: Number,
+      default: 0,
+    },
     comments: [
       {
         type: Schema.Types.ObjectId,
         ref: "Comment",
-        required: true,
       },
     ],
+    commentCount: {
+      type: Number,
+      default: 0,
+    },
     categories: [
       {
         type: Schema.Types.ObjectId,
         ref: "Category",
-        required: true,
       },
     ],
     tags: [

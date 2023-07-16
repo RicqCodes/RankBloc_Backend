@@ -11,7 +11,7 @@ const LikeSChema = new Schema({
     required: true,
     refPath: "likedEntityType",
   },
-  linkedEntityType: {
+  likedEntityType: {
     type: String,
     required: true,
     enum: ["BlogPost", "Comment"],
