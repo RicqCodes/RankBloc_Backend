@@ -10,7 +10,7 @@ import mongoose from "mongoose";
 export const createComment = catchAsync(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     const { postId, text } = req.body;
-    const author = req.user._id;
+    const author = req.user?._id;
 
     // Create the comment
     const comment = await Comment.create({ blogPost: postId, text, author });
@@ -39,7 +39,7 @@ export const getBlogPostComments = catchAsync(
     const blogPost = await BlogPost.findById(blogPostId);
 
     if (!blogPost) {
-      next(new AppError("Blog post not found", 404));
+      return next(new AppError("Blog post not found", 404));
     }
 
     // Aggregate pipeline to fetch comments and their associated likes

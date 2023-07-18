@@ -6,9 +6,9 @@ import AppError from "../utils/appError";
 
 export const createTag = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { name, description } = req.body;
+    const { name } = req.body;
 
-    const tag = await Tag.create({ name, description });
+    const tag = await Tag.create({ name });
 
     res.status(201).json({
       status: "sucess",
@@ -44,7 +44,7 @@ export const getTag = catchAsync(
     const tag = await Tag.findById(tagId);
 
     if (!tag) {
-      next(new AppError("Tag is not found", 404));
+      return next(new AppError("Tag is not found", 404));
     }
 
     res.status(200).json({

@@ -10,3 +10,5 @@ const router = Router();
 router.route("/").get(getAllShares).post(createShare);
 
 router.route("/:postId").get(getSharesForPost);
+
+export default router;

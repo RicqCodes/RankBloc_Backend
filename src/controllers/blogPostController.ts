@@ -1,11 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import BlogPost from "../models/blogPostsModel";
+import handleTags from "../utils/tagUtils";
 import { IUser } from "../interfaces/User";
 import AppError from "../utils/appError";
 import { ApiFeatures } from "../utils/apiFeatures";
 import User from "../models/userModel";
 import Views from "../models/viewModel";
+import { Types } from "mongoose";
 
 interface customRequest extends Request {
   user: IUser;
@@ -13,10 +15,11 @@ interface customRequest extends Request {
 
 export const createBlogPost = catchAsync(
   async (req: customRequest, res: Response, next: NextFunction) => {
-    const { title, content, images, categories } = req.body;
+    const { title, content, images, tags = [], categories } = req.body;
 
-    if (req.user._id !== req.body.address) {
-      next(new AppError("Not authorized", 404));
+    let tagIds: (string | Types.ObjectId)[] = [];
+    if (tags.length > 0) {
+      tagIds = await handleTags(tags);
     }
 
     const author = req.user._id;
@@ -27,6 +30,7 @@ export const createBlogPost = catchAsync(
       images,
       categories,
       author,
+      tags: tagIds,
     });
 
     // Increment the reputation score of the author
@@ -64,9 +68,10 @@ export const getAllBlogPost = catchAsync(
 export const getBlogPost = catchAsync(
   async (req: customRequest, res: Response, next: NextFunction) => {
     const blogPost = await BlogPost.findById(req.params.id);
+    const viewer = req.user._id;
 
     if (!blogPost) {
-      next(new AppError("This blog post does not exist", 404));
+      return next(new AppError("This blog post does not exist", 404));
     }
 
     // Increment the reputation score of the author for views
@@ -74,8 +79,6 @@ export const getBlogPost = catchAsync(
     await User.findByIdAndUpdate(blogPost?.author, {
       $inc: { reputation: incrementBy },
     });
-
-    const viewer = req.user._id;
 
     // Check if the view is already recorded
     const existingView = await Views.findOne({
@@ -86,7 +89,7 @@ export const getBlogPost = catchAsync(
     if (!existingView) {
       // View is unique, increment the reputation score of the blog post creator
       const incrementBy = process.env.POST_VIEWED; // Specify the amount to increment by
-      await User.findByIdAndUpdate(req.user._id, {
+      await User.findByIdAndUpdate(blogPost?.author, {
         $inc: { reputation: incrementBy },
       });
 
@@ -113,7 +116,7 @@ export const updateBlogPost = catchAsync(
       blogPost?.author.toString() !== userId.toString() &&
       req.user.role !== "admin"
     ) {
-      next(new AppError("Unauthorized", 404));
+      return next(new AppError("Unauthorized", 404));
     }
 
     if (!blogPost) {
@@ -139,10 +142,10 @@ export const deleteBlogPost = catchAsync(
 
     // Check if the blog post belongs to the authenticated user
     if (
-      blogPost?.author.toString() !== userId.toString() &&
+      blogPost?.author.toString() !== userId.toString() ||
       req.user.role !== "admin"
     ) {
-      next(new AppError("Unauthorized", 404));
+      return next(new AppError("Unauthorized", 404));
     }
 
     if (!blogPost) {

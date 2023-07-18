@@ -13,7 +13,7 @@ export const createUser = catchAsync(
 
     // Check if user exists
     if (existingUser) {
-      next(new AppError("User already exists", 409));
+      return next(new AppError("User already exists", 409));
     }
 
     // Save new user to the  database
@@ -56,7 +56,7 @@ export const getUser = catchAsync(
     const user = await User.findOne({ publicAddress: address });
 
     if (!user) {
-      next(new AppError("User does not exist", 404));
+      return next(new AppError("User does not exist", 404));
     }
 
     res.status(200).json({
@@ -68,26 +68,38 @@ export const getUser = catchAsync(
   }
 );
 
-export const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const { address } = req.query;
-  const user = await User.findOneAndUpdate(
-    { publicAddress: address },
-    req.body,
-    { new: true, runValidators: true }
-  );
+export const updateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { address } = req.query;
+    const user = await User.findOneAndUpdate(
+      { publicAddress: address },
+      req.body,
+      { new: true, runValidators: true }
+    );
 
-  res.status(200).json({
-    status: "success",
-    data: { user },
-  });
-});
+    if (!user) {
+      return next(new AppError("No user found with that id", 404));
+    }
 
-export const deleteUser = catchAsync(async (req: Request, res: Response) => {
-  const { address } = req.query;
-  await User.findOneAndDelete({ publicAddress: address });
+    res.status(200).json({
+      status: "success",
+      data: { user },
+    });
+  }
+);
 
-  res.status(204).json({
-    status: "success",
-    data: null,
-  });
-});
+export const deleteUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { address } = req.query;
+    const user = await User.findOneAndDelete({ publicAddress: address });
+
+    if (!user) {
+      return next(new AppError("No user found with that id", 404));
+    }
+
+    res.status(204).json({
+      status: "success",
+      data: null,
+    });
+  }
+);

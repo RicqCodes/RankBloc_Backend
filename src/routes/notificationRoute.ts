@@ -16,3 +16,5 @@ router
   .get(getNotification)
   .patch(updateNotification)
   .delete(deleteNotification);
+
+export default router;

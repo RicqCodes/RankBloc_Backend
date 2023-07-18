@@ -41,7 +41,7 @@ export const getCategory = catchAsync(
     const category = await Category.findById(req.params.id);
 
     if (!category) {
-      next(new AppError("Category not found", 404));
+      return next(new AppError("Category not found", 404));
     }
 
     res.status(200).json({
@@ -60,7 +60,7 @@ export const updateCateogry = catchAsync(
     });
 
     if (!category) {
-      next(new AppError("Category not found", 404));
+      return next(new AppError("Category not found", 404));
     }
 
     res.status(200).json({ status: "success", data: { category } });
@@ -72,7 +72,7 @@ export const deleteCategory = catchAsync(
     const category = await Category.findByIdAndDelete(req.params.id);
 
     if (!category) {
-      next(new AppError("Category not found", 404));
+      return next(new AppError("Category not found", 404));
     }
 
     res.status(204).json({

@@ -40,6 +40,7 @@ const userSchema = new Schema<IUser>(
       required: [true, "A signed Message is required"],
       select: false,
     },
+
     reputation: {
       type: Number,
       default: 0,

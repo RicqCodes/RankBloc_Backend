@@ -6,11 +6,12 @@ import Like from "../models/likesModel";
 import User from "../models/userModel";
 import BlogPost from "../models/blogPostsModel";
 import Comment from "../models/commentsModel";
+import AppError from "../utils/appError";
 
 export const likeEntity = catchAsync(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
     const { entityId, entityType } = req.params;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     // Check if there is an existing like for the user and entity combination
     const existingLike = await Like.findOne({
@@ -110,6 +111,10 @@ export const getEntityLikes = catchAsync(
       likedEntity: entityId,
       likedEntityType: entityType,
     });
+
+    if (!likes) {
+      return next(new AppError("no like for this entity", 404));
+    }
 
     res.status(200).json({
       status: "success",

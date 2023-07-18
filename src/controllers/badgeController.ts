@@ -40,7 +40,7 @@ export const getBadge = catchAsync(
     const badge = await Badge.findById(req.params.id);
 
     if (!badge) {
-      next(new AppError("Category not found", 404));
+      return next(new AppError("Category not found", 404));
     }
 
     res.status(200).json({
@@ -59,7 +59,7 @@ export const updateBadge = catchAsync(
     });
 
     if (!badge) {
-      next(new AppError("Badge not found", 404));
+      return next(new AppError("Badge not found", 404));
     }
 
     res.status(200).json({ status: "success", data: { badge } });
@@ -68,10 +68,10 @@ export const updateBadge = catchAsync(
 
 export const deleteBadge = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const category = await Badge.findByIdAndDelete(req.params.kd);
+    const badge = await Badge.findByIdAndDelete(req.params.kd);
 
-    if (!category) {
-      next(new AppError("Badge not found", 404));
+    if (!badge) {
+      return next(new AppError("Badge not found", 404));
     }
 
     res.status(204).json({

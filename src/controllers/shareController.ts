@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import Share from "../models/sharesModel";
 import { ApiFeatures } from "../utils/apiFeatures";
+import AppError from "../utils/appError";
 
 export const createShare = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -21,6 +22,10 @@ export const getSharesForPost = catchAsync(
     const { postId } = req.params;
 
     const shares = await Share.find({ blogPost: postId }).populate("user");
+
+    if (!shares) {
+      next(new AppError("No share for this post", 404));
+    }
 
     res.status(200).json({
       status: "success",

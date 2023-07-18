@@ -5,10 +5,6 @@ const TagSchema = new Schema({
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-    required: true,
-  },
 });
 
 const Tag = model("Tag", TagSchema);
