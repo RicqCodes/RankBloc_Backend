@@ -36,21 +36,20 @@ export class ApiFeatures {
   sort() {
     if (this.queryString.sort) {
       const sort = this.queryString.sort as string;
-      const sortBy = sort.split(",").join(" ");
 
-      this.query = this.query.sort(sortBy);
-    } else {
-      this.query = this.query.sort("-createdAt");
+      this.query = this.query.sort(ApiFeatures.formatQuery(sort));
+      return this;
     }
+
+    this.query = this.query.sort("-createdAt");
     return this;
   }
 
   limitFields() {
     if (this.queryString.fields) {
       const fields = this.queryString.fields as string;
-      const returnedFields = fields.split(",").join(" ");
 
-      this.query = this.query.select(returnedFields);
+      this.query = this.query.select(ApiFeatures.formatQuery(fields));
     } else {
       this.query = this.query.select("-__v");
     }
@@ -65,5 +64,13 @@ export class ApiFeatures {
     this.query = this.query.skip(skip).limit(limit);
 
     return this;
+  }
+
+  static formatQuery(query: string[] | String) {
+    if (Array.isArray(query)) {
+      return query.join(" ");
+    } else {
+      return query.replaceAll(",", " ");
+    }
   }
 }
