@@ -1,13 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import BlogPost from "../models/blogPostsModel";
-import handleTags from "../utils/tagUtils";
+import handleFindOrCreate from "../utils/tagUtils";
 import { IUser } from "../interfaces/User";
 import AppError from "../utils/appError";
 import { ApiFeatures } from "../utils/apiFeatures";
 import User from "../models/userModel";
 import Views from "../models/viewModel";
-import { Types } from "mongoose";
+import { Document, Model, Types } from "mongoose";
+import Tag from "../models/tagModels";
+import Category from "../models/categoriesModel";
+import { ITag } from "../interfaces/Tag";
 
 interface customRequest extends Request {
   user: IUser;
@@ -15,11 +18,17 @@ interface customRequest extends Request {
 
 export const createBlogPost = catchAsync(
   async (req: customRequest, res: Response, next: NextFunction) => {
-    const { title, content, images, tags = [], categories } = req.body;
+    const { title, content, images, tags = [], categories = [] } = req.body;
 
-    let tagIds: (string | Types.ObjectId)[] = [];
+    let tagIds: Types.ObjectId[] = [];
+    let categoryIds: Types.ObjectId[] = [];
+
     if (tags.length > 0) {
-      tagIds = await handleTags(tags);
+      tagIds = await handleFindOrCreate(tags, Tag);
+    }
+
+    if (categories.length > 0) {
+      categoryIds = await handleFindOrCreate(categories, Category);
     }
 
     const author = req.user._id;
@@ -28,7 +37,7 @@ export const createBlogPost = catchAsync(
       title,
       content,
       images,
-      categories,
+      categories: categoryIds,
       author,
       tags: tagIds,
     });

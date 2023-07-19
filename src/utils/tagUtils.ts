@@ -1,29 +1,33 @@
-import mongoose from "mongoose";
-import Tag from "../models/tagModels";
+import mongoose, { Types, Model, Document } from "mongoose";
+import { ITag } from "../interfaces/Tag";
+import { ICategory } from "../interfaces/Category";
 
-type tagArray = string[];
+type typeArray = string[];
 
-const handleTags = async (tags: tagArray) => {
-  const tagIds = [];
+const handleFindOrCreate = async (
+  entities: typeArray,
+  model: Model<ICategory | ITag>
+) => {
+  const ids: Types.ObjectId[] = [];
 
-  for (const tag of tags) {
-    if (mongoose.Types.ObjectId.isValid(tag)) {
-      tagIds.push(tag);
+  for (const entity of entities) {
+    if (mongoose.Types.ObjectId.isValid(entity)) {
+      ids.push(new mongoose.Types.ObjectId(entity));
     } else {
-      // Check if the tag already exists in the database
-      const existingTag = await Tag.findOne({ name: tag });
+      // Check if the entity already exists in the database
+      const existingEntity = await model.findOne({ name: entity });
 
-      if (existingTag) {
-        tagIds.push(existingTag._id);
+      if (existingEntity) {
+        ids.push(existingEntity._id);
       } else {
-        // Create a new tag document and add it to the database
-        const newTag = await Tag.create({ name: tag });
-        tagIds.push(newTag._id);
+        // Create a new entity document and add it to the database
+        const newentity = await model.create({ name: entity });
+        ids.push(newentity._id);
       }
     }
   }
 
-  return tagIds;
+  return ids;
 };
 
-export default handleTags;
+export default handleFindOrCreate;

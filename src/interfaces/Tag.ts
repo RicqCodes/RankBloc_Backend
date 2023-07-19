@@ -1,6 +1,3 @@
-import { Document, Types } from "mongoose";
-
-export interface ITag extends Document {
-  _id: Types.ObjectId;
+export interface ITag {
   name: string;
 }
