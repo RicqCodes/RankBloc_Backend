@@ -25,25 +25,18 @@ const verifySignedMessage = catchAsync(
     //   Retrieve message to be signed
     const message = process.env.SIGN_MESSAGE?.replace("<ADDRESS>", address);
 
-    if (!signedMessage || !message) {
+    if (!signedMessage) {
       next(
         new AppError("Missing signed message or signature in the header", 400)
       );
     }
 
+    const recoveredAddress = ethers.verifyMessage(message || "", signedMessage);
+
     // Find user with the signed message
-    const user = await User.findOne({ signedMessage }).select("+signedMessage");
+    const user = await User.findOne({ publicAddress: recoveredAddress });
 
     if (!user) {
-      next(new AppError("Unauthorized", 401));
-    }
-
-    // Verify signed message using ether.js
-    const recoveredAddress = ethers.verifyMessage(message || "", signedMessage);
-    const userAddress = user?.publicAddress.toLowerCase();
-
-    // Compare the recovered address with the user's public address
-    if (recoveredAddress.toLowerCase() !== userAddress) {
       next(new AppError("Unauthorized", 401));
     }
 

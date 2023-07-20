@@ -9,10 +9,12 @@ import likeRoute from "./likeRoute";
 import notificationRoute from "./notificationRoute";
 import sharesRoute from "./sharesRoute";
 import tagRoute from "./tagRoute";
+import userRelationRoute from "./userRelationshipRoute";
 
 const router = Router();
 
 router.use("/users", userRoute);
+router.use("/user-relationships", userRelationRoute);
 router.use("/blog-posts", blogPostRoute);
 router.use("/categories", categoryRoute);
 router.use("/badges", badgeRoute);
