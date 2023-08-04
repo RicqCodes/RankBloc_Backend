@@ -6,7 +6,7 @@ import { IUser } from "../interfaces/User";
 import AppError from "../utils/appError";
 import { ApiFeatures } from "../utils/apiFeatures";
 import User from "../models/userModel";
-import Views from "../models/viewModel";
+import Views from "../models/addReputation";
 import { Document, Model, Types } from "mongoose";
 import Tag from "../models/tagModels";
 import Category from "../models/categoriesModel";

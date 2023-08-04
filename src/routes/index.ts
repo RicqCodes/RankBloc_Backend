@@ -10,6 +10,7 @@ import notificationRoute from "./notificationRoute";
 import sharesRoute from "./sharesRoute";
 import tagRoute from "./tagRoute";
 import userRelationRoute from "./userRelationshipRoute";
+import miscellaneousRoute from "./miscellaneousRoute";
 
 const router = Router();
 
@@ -23,5 +24,5 @@ router.use("/likes", likeRoute);
 router.use("/notifications", notificationRoute);
 router.use("/shares", sharesRoute);
 router.use("/tags", tagRoute);
-
+router.use("miscellaneous", miscellaneousRoute);
 export default router;
