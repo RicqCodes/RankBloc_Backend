@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Document } from "mongoose";
-import { ethers } from "ethers";
+import { SignatureLike, ethers } from "ethers";
 
 import User from "../models/userModel";
 import { IUser } from "../interfaces/User";
@@ -13,31 +13,31 @@ interface CustomRequest extends Request {
 
 const verifySignedMessage = catchAsync(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
-    // Signed message from headers
-    const signedMessage = req.headers.signedMessage as string;
-    const { address } = req.body;
+    const signedMessage = req.headers["x-signed-message"];
+    const nonce = req.headers["x-nonce"];
 
-    // Check if address is available on body
-    if (!address) {
-      next(new AppError("Missing address in the body", 400));
-    }
-
-    //   Retrieve message to be signed
-    const message = process.env.SIGN_MESSAGE?.replace("<ADDRESS>", address);
-
-    if (!signedMessage) {
-      next(
+    // console.log(req.headers);
+    // Retrieve message to be signed
+    if (signedMessage === "undefined") {
+      return next(
         new AppError("Missing signed message or signature in the header", 400)
       );
     }
 
-    const recoveredAddress = ethers.verifyMessage(message || "", signedMessage);
+    const message = `I affix my digital seal to verify address for RankBloc.
+    NONCE: ${nonce}
+    `;
+
+    const recoveredAddress = ethers.verifyMessage(
+      message as string,
+      signedMessage as SignatureLike
+    );
 
     // Find user with the signed message
     const user = await User.findOne({ publicAddress: recoveredAddress });
 
     if (!user) {
-      next(new AppError("Unauthorized", 401));
+      return next(new AppError("Unauthorized", 401));
     }
 
     // Attach the user to the request object for further processing in subsequent middleware or route handlers

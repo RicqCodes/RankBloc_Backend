@@ -3,6 +3,7 @@ import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
 import ExpressMongoSanitize from "express-mongo-sanitize";
 import xss from "xss";
+import cors from "cors";
 import hpp from "hpp";
 
 import routes from "./routes";
@@ -13,6 +14,16 @@ import globalErrorHandler from "./controllers/errorController";
 const app = express();
 
 // Global middlewares
+
+// Configure CORS to allow requests only from onlt the frontend origin (http://localhost:3000)
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true, // Allow cookies and other credentials
+};
+
+app.use(cors(corsOptions)); // Enable CORS only for the specified origin
+// Handle OPTIONS request for preflight
+app.options("*", cors(corsOptions));
 
 // Set security HTTP headers
 app.use(helmet());
@@ -32,7 +43,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use(ExpressMongoSanitize());
 
 // Data sanitization against scripting attacks
-app.use(xss("<script></script>"));
+// app.use(xss("<script></script>"));
 
 // Prevent parameter pollution
 app.use(
@@ -42,9 +53,9 @@ app.use(
 );
 
 // Entire application routes
-app.use("api/v1", routes);
+app.use("/api/v1", routes);
 
-// unhandled routes
+// unhandled routesx
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });

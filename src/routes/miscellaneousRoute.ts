@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getMetadata } from "../controllers/miscellanous";
+import { getMetadata } from "../controllers/miscellaneous";
 
 const router = Router();
 

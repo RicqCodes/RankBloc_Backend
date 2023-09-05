@@ -28,7 +28,7 @@ export const createBlogPost = catchAsync(
     }
 
     if (categories.length > 0) {
-      categoryIds = await handleFindOrCreate(categories, Category);
+      // categoryIds = await handleFindOrCreate(categories, Category);
     }
 
     const author = req.user._id;

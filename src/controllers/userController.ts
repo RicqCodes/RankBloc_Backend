@@ -4,10 +4,11 @@ import { catchAsync } from "../utils/catchAsync";
 import User from "../models/userModel";
 import AppError from "../utils/appError";
 import { ApiFeatures } from "../utils/apiFeatures";
+import { CustomRequest } from "../interfaces/Custom";
 
 export const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { address, signedMessage } = req.body;
+    const { address } = req.body;
 
     const existingUser = await User.findOne({ publicAddress: address });
 
@@ -19,12 +20,14 @@ export const createUser = catchAsync(
     // Save new user to the  database
     const user = new User();
     user.publicAddress = address;
-    user.signedMessage = signedMessage;
+    user.photoUrl = `https://avatars.dicebear.com/api/bottts/${address}.svg`;
+
     await user.save();
 
     res.status(201).json({
       status: "success",
       message: "Account Created",
+      user,
     });
   }
 );
@@ -50,10 +53,8 @@ export const getAllUsers = catchAsync(
 );
 
 export const getUser = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { address } = req.query;
-
-    const user = await User.findOne({ publicAddress: address });
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const user = req.user;
 
     if (!user) {
       return next(new AppError("User does not exist", 404));
@@ -63,6 +64,34 @@ export const getUser = catchAsync(
       status: "success",
       data: {
         user,
+      },
+    });
+  }
+);
+
+export const getNonce = catchAsync(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const publicAddress = req.query.publicAddress;
+
+    console.log(publicAddress);
+
+    if (!publicAddress)
+      return next(new AppError("publicAddress missing from query", 401));
+
+    const user = await User.findOne({ publicAddress });
+
+    // if (!user)
+    //   return next(
+    //     new AppError(
+    //       "There's no nonce for this user or user does not exists",
+    //       404
+    //     )
+    //   );
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        nonce: user?.nonce,
       },
     });
   }

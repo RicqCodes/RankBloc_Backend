@@ -11,9 +11,11 @@ import sharesRoute from "./sharesRoute";
 import tagRoute from "./tagRoute";
 import userRelationRoute from "./userRelationshipRoute";
 import miscellaneousRoute from "./miscellaneousRoute";
+import authRoute from "./authRoute";
 
 const router = Router();
 
+router.use("/authentication", authRoute);
 router.use("/users", userRoute);
 router.use("/user-relationships", userRelationRoute);
 router.use("/blog-posts", blogPostRoute);
@@ -24,5 +26,5 @@ router.use("/likes", likeRoute);
 router.use("/notifications", notificationRoute);
 router.use("/shares", sharesRoute);
 router.use("/tags", tagRoute);
-router.use("miscellaneous", miscellaneousRoute);
+router.use("/miscellaneous", miscellaneousRoute);
 export default router;

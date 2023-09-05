@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import { ethers } from "ethers";
+import { generate } from "rand-token";
 
 import { IUser } from "../interfaces/User";
 
@@ -11,6 +12,7 @@ const userSchema = new Schema<IUser>(
     email: {
       type: String,
       unique: true,
+      sparse: true,
       validate: {
         message: "Email is not valid",
         validator: (email: string): Boolean => {
@@ -24,6 +26,10 @@ const userSchema = new Schema<IUser>(
         },
       },
     },
+    photoUrl: {
+      type: String,
+      required: [true, "A photo url must be present!"],
+    },
     publicAddress: {
       type: String,
       required: [true, "A wallet address must be present!"],
@@ -35,10 +41,11 @@ const userSchema = new Schema<IUser>(
         },
       },
     },
-    signedMessage: {
+    nonce: {
       type: String,
-      required: [true, "A signed Message is required"],
-      select: false,
+      default: function () {
+        return generate(16);
+      },
     },
 
     reputation: {
